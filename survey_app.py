@@ -61,4 +61,4 @@ if st.button("결과 확인하기"):
     st.write("## 🎉 평가 완료! 🎉")
     st.write(f"총점: **{total_score:.2f}**점입니다.")
     st.write(f"당신의 배정된 레벨은 **{level}** 입니다.")
-    st.write("👏 축하합니다! 더 높은 레벨을 목표로 계속 학습해 보세요.")
+    st.write(f"지금 바로 **{level}** 과정을 수강신청하고 한 단계 더 성장해볼까요? 💪")
