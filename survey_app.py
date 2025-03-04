@@ -1,14 +1,4 @@
 import streamlit as st
-import pandas as pd
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-# Google Sheets 연동 설정
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-credentials = ServiceAccountCredentials.from_json_keyfile_name("google_credentials.json", scope)
-gc = gspread.authorize(credentials)
-spreadsheet = gc.open("Survey Results")  # Google Sheets 문서명 (미리 생성해야 함)
-worksheet = spreadsheet.sheet1  # 첫 번째 시트 선택
 
 # 설문 문항 및 가중치 리스트
 survey_questions = [
@@ -57,11 +47,6 @@ def determine_level(total_score):
     else:
         return "Lv3"
 
-# 사용자 정보 입력
-st.sidebar.header("수강생 정보 입력")
-name = st.sidebar.text_input("이름을 입력하세요")
-email = st.sidebar.text_input("이메일을 입력하세요")
-
 # 설문을 5개씩 나누어 보여주기
 for i in range(0, len(survey_questions), 5):
     with st.expander(f"질문 {i+1} ~ {i+5 if i+5 < len(survey_questions) else len(survey_questions)}"):
@@ -72,14 +57,9 @@ for i in range(0, len(survey_questions), 5):
 if st.button("결과 확인하기"):
     total_score = sum(calculate_score(weight, response) for weight, response in responses)
     level = determine_level(total_score)
-    
+
     st.write("## 🎉 평가 완료! 🎉")
     st.write(f"총점: **{total_score:.2f}**점입니다.")
     st.write(f"당신의 배정된 레벨은 **{level}** 입니다.")
+    st.write("👏 축하합니다! 더 높은 레벨을 목표로 계속 학습해 보세요.")
     st.write(f"지금 바로 **{level}** 과정을 수강신청하고 한 단계 더 성장해볼까요? 💪")
-    
-    # 수강생 데이터 Google Sheets에 저장
-    data = [name, email, total_score, level]
-    worksheet.append_row(data)
-
-
