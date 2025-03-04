@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 # 설문 문항 및 가중치 리스트
 survey_questions = [
@@ -47,6 +48,11 @@ def determine_level(total_score):
     else:
         return "Lv3"
 
+# 사용자 정보 입력
+st.sidebar.header("수강생 정보 입력")
+name = st.sidebar.text_input("이름을 입력하세요")
+email = st.sidebar.text_input("이메일을 입력하세요")
+
 # 설문을 5개씩 나누어 보여주기
 for i in range(0, len(survey_questions), 5):
     with st.expander(f"질문 {i+1} ~ {i+5 if i+5 < len(survey_questions) else len(survey_questions)}"):
@@ -62,3 +68,13 @@ if st.button("결과 확인하기"):
     st.write(f"총점: **{total_score:.2f}**점입니다.")
     st.write(f"당신의 배정된 레벨은 **{level}** 입니다.")
     st.write(f"지금 바로 **{level}** 과정을 수강신청하고 한 단계 더 성장해볼까요? 💪")
+    
+    # 수강생 데이터 저장
+    data = {"이름": [name], "이메일": [email], "총점": [total_score], "레벨": [level]}
+    df = pd.DataFrame(data)
+    
+    # CSV 파일 저장
+    df.to_csv("survey_results.csv", mode='a', header=False, index=False)
+    
+    st.write("📊 설문 응답이 저장되었습니다! 관리자 페이지에서 확인하세요.")
+
