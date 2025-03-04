@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 # 설문 문항 및 가중치 리스트
@@ -25,9 +24,17 @@ survey_questions = [
     ("나는 최적화 기법(Gradient Descent, Adam Optimizer 등)을 이해하고, 모델의 성능을 개선할 수 있다.", 7)
 ]
 
+responses = []
+
+st.title("📝 Python 데이터 분석 역량 평가")
+st.write("각 문항에 대해 아래 중 하나를 선택하세요.")
+st.write("\n")
+
+options = ["아주 그렇지 않다", "그렇지 않다", "보통이다", "그렇다", "아주 그렇다"]
+
 def calculate_score(weight, response):
     """환산 점수 계산"""
-    return weight * (response / 5)
+    return weight * ((options.index(response) + 1) / 5)
 
 def determine_level(total_score):
     """총점에 따라 레벨 결정"""
@@ -40,24 +47,18 @@ def determine_level(total_score):
     else:
         return "Lv3"
 
-# Streamlit UI 시작
-st.title("📝 Python 데이터 분석 역량 평가")
+# 설문을 5개씩 나누어 보여주기
+for i in range(0, len(survey_questions), 5):
+    with st.expander(f"질문 {i+1} ~ {i+5 if i+5 < len(survey_questions) else len(survey_questions)}"):
+        for question, weight in survey_questions[i:i+5]:
+            response = st.radio(question, options, index=2)
+            responses.append((weight, response))
 
-st.write("각 문항에 대해 1~5 사이의 점수를 선택하세요.")
-st.write("1: 아주 그렇지 않다 | 2: 그렇지 않다 | 3: 보통이다 | 4: 그렇다 | 5: 아주 그렇다")
-st.write("---")
-
-# 사용자 입력 받기
-responses = []
-for question, weight in survey_questions:
-    response = st.slider(question, min_value=1, max_value=5, value=3)
-    responses.append((weight, response))
-
-# 점수 계산
 if st.button("결과 확인하기"):
     total_score = sum(calculate_score(weight, response) for weight, response in responses)
     level = determine_level(total_score)
-
-    st.write("## 🏆 평가 결과")
-    st.write(f"**총점:** {total_score:.2f}")
-    st.write(f"**배정된 레벨:** {level}")
+    
+    st.write("## 🎉 평가 완료! 🎉")
+    st.write(f"총점: **{total_score:.2f}**점입니다.")
+    st.write(f"당신의 배정된 레벨은 **{level}** 입니다.")
+    st.write("👏 축하합니다! 더 높은 레벨을 목표로 계속 학습해 보세요.")
