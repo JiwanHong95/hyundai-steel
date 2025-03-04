@@ -1,5 +1,14 @@
 import streamlit as st
 import pandas as pd
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+# Google Sheets 연동 설정
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+credentials = ServiceAccountCredentials.from_json_keyfile_name("google_credentials.json", scope)
+gc = gspread.authorize(credentials)
+spreadsheet = gc.open("Survey Results")  # Google Sheets 문서명 (미리 생성해야 함)
+worksheet = spreadsheet.sheet1  # 첫 번째 시트 선택
 
 # 설문 문항 및 가중치 리스트
 survey_questions = [
@@ -69,12 +78,8 @@ if st.button("결과 확인하기"):
     st.write(f"당신의 배정된 레벨은 **{level}** 입니다.")
     st.write(f"지금 바로 **{level}** 과정을 수강신청하고 한 단계 더 성장해볼까요? 💪")
     
-    # 수강생 데이터 저장
-    data = {"이름": [name], "이메일": [email], "총점": [total_score], "레벨": [level]}
-    df = pd.DataFrame(data)
-    
-    # CSV 파일 저장
-    df.to_csv("survey_results.csv", mode='a', header=False, index=False)
-    
-    st.write("📊 설문 응답이 저장되었습니다! 관리자 페이지에서 확인하세요.")
+    # 수강생 데이터 Google Sheets에 저장
+    data = [name, email, total_score, level]
+    worksheet.append_row(data)
+
 
